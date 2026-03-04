@@ -1,4 +1,106 @@
 <!DOCTYPE html>
+<!--
+=============================================================
+  FILE: Math Fluency Primer | Foundations: Closing the Gap
+  SERIES: Foundations: Closing the Gap (standalone module)
+  LEVEL: College freshmen / students with K-12 math gaps
+=============================================================
+
+  WHAT THIS FILE IS:
+  A single-file, self-contained HTML math remediation guide
+  aimed at students entering college science courses who have
+  gaps in foundational arithmetic and pre-algebra. Written in
+  a direct, non-judgmental voice grounded in learning science.
+
+  CONTENT COVERAGE (6 content tabs):
+  Start Here   — Why gaps exist (K-12 reform context, COVID),
+                 what this guide covers, note on calculators
+  Fractions    — Vocabulary; multiply, divide, add/subtract;
+                 simplifying; science applications
+  Number Facts — Multiplication table (6–9s), integer ops,
+                 squares/roots table, estimation habits
+  Algebra Basics — Golden rule; solve for variable; rearrange
+                   formulas (gas law, molarity); proportions;
+                   PEMDAS with worked examples
+  Units & Conversions — Dimensional analysis method;
+                        conversion factors; metric prefixes table;
+                        staircase trick; unit-error detection
+  Scientific Notation — Convert to/from; multiply; divide;
+                        add/subtract; significant figures rules
+
+  INTERACTIVE FEATURES:
+  • Disclaimer — collapsible (in Start Here tab)
+  • Quiz — 30 shuffled multiple-choice questions across all
+    categories; per-question feedback; final score with message
+  • Flashcards — 36 cards across 5 categories with 3D flip
+    animation; category filter buttons; prev/next navigation
+
+  TAB STRUCTURE (8 tabs):
+  • #panel-start        → Start Here content
+  • #panel-fractions    → Fractions
+  • #panel-arithmetic   → Number Facts
+  • #panel-algebra      → Algebra Basics
+  • #panel-units        → Units & Conversions
+  • #panel-notation     → Scientific Notation
+  • #panel-quiz         → Quiz engine
+  • #panel-flashcards   → Flashcard navigator
+
+  DESIGN:
+  • Warm amber/teal dual-accent theme:
+    --math #B85C00 (amber) for content; --accent #2E7D6F (teal)
+    for callout borders and structural elements
+  • --math-aa #934900 — accessible darker amber for small text
+  • Backgrounds: --bg #FAFAF7, --card-bg #FFFFFF,
+    --warm #F5F0E8, --math-light #FFF3E0, --code-bg #F4F1EB
+  • Fonts: Crimson Pro (serif headings/display),
+    Source Sans 3 (body), JetBrains Mono (labels/code)
+    — all via Google Fonts
+  • Responsive: breakpoints at 768px and 480px
+
+  ACCESSIBILITY (WCAG 2.1 AA):
+  • Skip-to-main-content link
+  • Visible :focus-visible outlines (3px #005fcc)
+  • prefers-reduced-motion disables tab fade and card flip
+  • Semantic <header role="banner"> for series-banner+hero block
+  • Semantic <footer> for site-footer
+  • All color pairs meet 4.5:1 contrast minimum for small text:
+    - .series-banner span: #7ECFC4 → #DCF8F5 (6.80:1 on acc-dark)
+    - .worked-label: --math → --math-aa #934900 (6.38:1 on #FFFBF5)
+    - .math-block / .math-inline: --math → --math-aa (5.83:1 on code-bg)
+    - .definition .term: --math → --math-aa (5.83:1 on code-bg)
+    - .reflection .q-num: --math → --math-aa (5.80:1 on warm)
+    - .callout.math strong: --math → --math-aa (6.00:1 on math-light)
+  • Tab nav: role="tablist", all tabs have role="tab",
+    aria-selected, aria-controls; updated via JS on click
+  • Tab panels: role="tabpanel", aria-labelledby pointing to tab btn
+  • All <button> elements have explicit type="button"
+  • Flashcard scene: role="button", tabindex="0",
+    Enter/Space keyboard handler, dynamic aria-label on flip
+  • Flashcard .fc-hint has aria-hidden="true"
+  • Category filter buttons have type="button"
+  • Quiz option buttons are real <button> elements (already were)
+  • Disclaimer toggle uses type="button" and aria-expanded
+
+  JAVASCRIPT STRUCTURE:
+  • Tab click handler — toggles active class and aria-selected
+  • toggleDisc() — open/close disclaimer; updates aria-expanded
+  • questions[] — 30 quiz questions with cat/q/opts/ans/exp
+  • shuffle(arr) — Fisher-Yates style sort
+  • startQuiz() — initialises shuffled deck
+  • renderQuestion() — renders current question
+  • selectAnswer(i) — grades and shows feedback
+  • nextQuestion() — advances or shows final score
+  • showFinal() — displays score summary
+  • cards[] — 36 flashcards with cat/front/back
+  • cats[] — derived category list for filter buttons
+  • buildFilters() — renders filter buttons
+  • renderCard() — renders current card front/back text
+  • flipCard(el) — toggles flipped class + updates aria-label
+  • fcNav(dir) — advances/retreats card index
+
+  LAST MODIFIED: Applied WCAG 2.1 AA accessibility fixes
+=============================================================
+-->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -26,8 +128,8 @@
   --shadow: 0 2px 12px rgba(0,0,0,0.06);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.1);
   --radius: 10px;
-  /* Math-specific accent: a warm amber that feels distinct from Compass teal */
   --math: #B85C00;
+  --math-aa: #934900;  /* darkened --math for small text; passes 4.5:1 on all math bg surfaces */
   --math-light: #FFF3E0;
   --math-glow: rgba(184,92,0,0.10);
 }
@@ -52,7 +154,8 @@ body {
   text-transform: uppercase;
   padding: 0.45rem 1rem;
 }
-.series-banner span { color: #7ECFC4; }
+/* #7ECFC4 on acc-dark = 4.20:1 (fail for 0.72rem) → #DCF8F5 = 6.80:1 */
+.series-banner span { color: #DCF8F5; }
 
 /* HERO */
 .hero {
@@ -200,7 +303,8 @@ body {
 .callout strong { color: var(--accent-dark); }
 .callout.warm strong { color: #8B6914; }
 .callout.honest strong { color: #993333; }
-.callout.math strong { color: var(--math); }
+/* math on math-light = 4.19:1 (fail) → --math-aa = 5.99:1 */
+.callout.math strong { color: var(--math-aa); }
 
 /* WORKED EXAMPLE BOX */
 .worked {
@@ -211,12 +315,13 @@ body {
   margin: 1.2rem 0;
   font-size: 0.97rem;
 }
+/* math on #FFFBF5 at 0.72rem = 4.46:1 (fail) → --math-aa = 6.38:1 */
 .worked-label {
   font-family: var(--mono);
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--math);
+  color: var(--math-aa);
   font-weight: 500;
   margin-bottom: 0.7rem;
 }
@@ -245,7 +350,8 @@ body {
   color: var(--math);
 }
 
-/* MATH DISPLAY - formula rendering */
+/* MATH DISPLAY */
+/* math on code-bg at 1rem = 4.08:1 (fail) → --math-aa = 5.83:1 */
 .math-block {
   background: var(--code-bg);
   border: 1px solid var(--border);
@@ -254,17 +360,18 @@ body {
   margin: 0.8rem 0;
   font-family: var(--mono);
   font-size: 1rem;
-  color: var(--math);
+  color: var(--math-aa);
   text-align: center;
   letter-spacing: 0.02em;
 }
+/* math on code-bg at ~0.95em = 4.08:1 (fail) → --math-aa = 5.83:1 */
 .math-inline {
   font-family: var(--mono);
   font-size: 0.95em;
   background: var(--code-bg);
   padding: 0.1em 0.4em;
   border-radius: 4px;
-  color: var(--math);
+  color: var(--math-aa);
 }
 
 /* FACT TABLE */
@@ -313,10 +420,11 @@ body {
   gap: 0.6rem;
 }
 .reflection .q:last-child { border-bottom: none; }
+/* math on warm at 0.82rem = 4.05:1 (fail) → --math-aa = 5.80:1 */
 .reflection .q-num {
   font-family: var(--mono);
   font-size: 0.82rem;
-  color: var(--math);
+  color: var(--math-aa);
   font-weight: 500;
   flex-shrink: 0;
   margin-top: 0.1rem;
@@ -384,10 +492,11 @@ body {
   margin: 0.8rem 0;
   font-size: 0.95rem;
 }
+/* math on code-bg at 0.90rem = 4.08:1 (fail) → --math-aa = 5.83:1 */
 .definition .term {
   font-family: var(--mono);
   font-weight: 500;
-  color: var(--math);
+  color: var(--math-aa);
   font-size: 0.9rem;
 }
 .definition .meaning { margin-top: 0.3rem; color: var(--text); }
@@ -642,6 +751,11 @@ body {
   color: #8B6914;
   font-weight: 600;
   user-select: none;
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-family: var(--sans);
+  text-align: left;
 }
 .disclaimer-toggle .darrow { transition: transform 0.3s; }
 .disclaimer-wrap.open .darrow { transform: rotate(180deg); }
@@ -680,10 +794,11 @@ body {
   outline: 3px solid #005fcc !important;
   outline-offset: 2px !important;
 }
-.tab-btn:focus-visible, .nav-btn:focus-visible {
+.tab-btn:focus-visible {
   outline: 3px solid #005fcc !important;
   outline-offset: 2px !important;
 }
+
 /* ─── Skip link ─── */
 .skip-link {
   position: absolute;
@@ -699,33 +814,41 @@ body {
   z-index: 9999;
   transition: top 0.2s;
 }
-.skip-link:focus {
-  top: 0;
-}
+.skip-link:focus { top: 0; }
 
+/* ─── Reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 </style>
 </head>
 <body>
 <a href="#main-content" class="skip-link">Skip to main content</a>
 
+<header role="banner">
+  <div class="series-banner">Foundations: Closing the Gap &nbsp;&mdash;&nbsp; <span>Math Fluency Primer</span></div>
 
-<div class="series-banner">Foundations: Closing the Gap &nbsp;&mdash;&nbsp; <span>Math Fluency Primer</span></div>
-
-<div class="hero">
-  <h1>Math Fluency Primer</h1>
-  <div class="subtitle">The arithmetic and pre-algebra you were never drilled on, explained clearly and honestly, so it stops slowing you down in science courses.</div>
-  <div class="byline">You were not taught these things properly. That is not an excuse or a complaint. It is just true. And it can be fixed.</div>
-</div>
+  <div class="hero">
+    <h1>Math Fluency Primer</h1>
+    <div class="subtitle">The arithmetic and pre-algebra you were never drilled on, explained clearly and honestly, so it stops slowing you down in science courses.</div>
+    <div class="byline">You were not taught these things properly. That is not an excuse or a complaint. It is just true. And it can be fixed.</div>
+  </div>
+</header>
 
 <nav class="tab-nav" role="tablist" aria-label="Page sections" id="tabNav">
-  <button role="tab" aria-selected="true" aria-controls="panel-start" class="tab-btn active" data-tab="start">Start Here</button>
-  <button role="tab" aria-selected="false" aria-controls="panel-fractions" class="tab-btn" data-tab="fractions">Fractions</button>
-  <button role="tab" aria-selected="false" aria-controls="panel-arithmetic" class="tab-btn" data-tab="arithmetic">Number Facts</button>
-  <button role="tab" aria-selected="false" aria-controls="panel-algebra" class="tab-btn" data-tab="algebra">Algebra Basics</button>
-  <button role="tab" aria-selected="false" aria-controls="panel-units" class="tab-btn" data-tab="units">Units &amp; Conversions</button>
-  <button role="tab" aria-selected="false" aria-controls="panel-notation" class="tab-btn" data-tab="notation">Scientific Notation</button>
-  <button role="tab" aria-selected="false" aria-controls="panel-quiz" class="tab-btn" data-tab="quiz">Quiz</button>
-  <button role="tab" aria-selected="false" aria-controls="panel-flashcards" class="tab-btn" data-tab="flashcards">Flashcards</button>
+  <button type="button" role="tab" aria-selected="true"  aria-controls="panel-start"      id="btn-start"      class="tab-btn active" data-tab="start">Start Here</button>
+  <button type="button" role="tab" aria-selected="false" aria-controls="panel-fractions"  id="btn-fractions"  class="tab-btn" data-tab="fractions">Fractions</button>
+  <button type="button" role="tab" aria-selected="false" aria-controls="panel-arithmetic" id="btn-arithmetic" class="tab-btn" data-tab="arithmetic">Number Facts</button>
+  <button type="button" role="tab" aria-selected="false" aria-controls="panel-algebra"    id="btn-algebra"    class="tab-btn" data-tab="algebra">Algebra Basics</button>
+  <button type="button" role="tab" aria-selected="false" aria-controls="panel-units"      id="btn-units"      class="tab-btn" data-tab="units">Units &amp; Conversions</button>
+  <button type="button" role="tab" aria-selected="false" aria-controls="panel-notation"   id="btn-notation"   class="tab-btn" data-tab="notation">Scientific Notation</button>
+  <button type="button" role="tab" aria-selected="false" aria-controls="panel-quiz"       id="btn-quiz"       class="tab-btn" data-tab="quiz">Quiz</button>
+  <button type="button" role="tab" aria-selected="false" aria-controls="panel-flashcards" id="btn-flashcards" class="tab-btn" data-tab="flashcards">Flashcards</button>
 </nav>
 
 <div class="container" id="main-content" role="main">
@@ -734,21 +857,21 @@ body {
 <div class="tab-panel active" id="panel-start" role="tabpanel" aria-labelledby="btn-start">
 
   <div class="disclaimer-wrap" id="disc">
-    <div class="disclaimer-toggle" onclick="toggleDisc()">
+    <button type="button" class="disclaimer-toggle" onclick="toggleDisc()" aria-expanded="false" aria-controls="disc-body">
       <span>&#9888;&#65039; Important Disclaimer</span>
-      <span class="darrow">&#9660;</span>
-    </div>
-    <div class="disclaimer-body">
+      <span class="darrow" aria-hidden="true">&#9660;</span>
+    </button>
+    <div class="disclaimer-body" id="disc-body">
       <div class="disclaimer-inner">
         <p>This resource is provided free of charge as a supplemental study aid. It is not a substitute for your course textbook, your instructor's materials, or formal tutoring. While every effort has been made to ensure accuracy, errors may exist. Always verify against your official course materials.</p>
-        <p>This site is not affiliated with any university, college, testing organization, or publisher. It represents independent educational work. Content is provided "as is" without warranty. Use your own judgment and consult your instructors when in doubt.</p>
+        <p>This site is not affiliated with any university, college, testing organization, or publisher. It represents independent educational work. Content is provided &ldquo;as is&rdquo; without warranty. Use your own judgment and consult your instructors when in doubt.</p>
       </div>
     </div>
   </div>
 
   <div class="card">
     <h2>Why You Have These Gaps</h2>
-    <p>If you are reading this because math slows you down in chemistry, biology, or physics, the first thing you need to understand is that the problem almost certainly did not start with you. It started with decisions made in your K-12 education that prioritized "conceptual understanding" over fluency, and in doing so, left a generation of students who understand what multiplication means but cannot do it automatically.</p>
+    <p>If you are reading this because math slows you down in chemistry, biology, or physics, the first thing you need to understand is that the problem almost certainly did not start with you. It started with decisions made in your K-12 education that prioritized &ldquo;conceptual understanding&rdquo; over fluency, and in doing so, left a generation of students who understand what multiplication means but cannot do it automatically.</p>
 
     <p>Here is what happened. Starting in the late 1990s and accelerating through the 2000s and 2010s, math education reformers shifted emphasis away from memorization and procedural fluency toward discovery learning and conceptual reasoning. The theory was sound: understanding why something works is better than just knowing how to do it. The execution was catastrophic. You got the theory without the practice. You got the concept without the automaticity. And when you sit down to balance a chemistry equation or calculate a drug dosage, your brain is burning energy on the arithmetic instead of the actual problem.</p>
 
@@ -773,7 +896,7 @@ body {
         <div class="step-num">2</div>
         <div class="step-body">
           <strong>Number Facts and Arithmetic Automaticity</strong>
-          <p>Multiplication tables, integer operations, and basic mental arithmetic. If you are counting on your fingers or reaching for a calculator for 7 × 8, this is burning cognitive load you need for the actual science.</p>
+          <p>Multiplication tables, integer operations, and basic mental arithmetic. If you are counting on your fingers or reaching for a calculator for 7 &times; 8, this is burning cognitive load you need for the actual science.</p>
         </div>
       </div>
       <div class="step">
@@ -853,36 +976,36 @@ body {
     <h3>Rule 1: Multiplying Fractions</h3>
     <p>Multiply straight across: numerator times numerator, denominator times denominator. This is the easiest fraction operation.</p>
     <div class="math-block">
-      (a/b) × (c/d) = (a × c) / (b × d)
+      (a/b) &times; (c/d) = (a &times; c) / (b &times; d)
     </div>
     <div class="worked">
       <div class="worked-label">Worked Example</div>
-      <div class="problem">Calculate: (2/3) × (4/5)</div>
-      <div class="step-line"><span class="math-expr">(2/3) × (4/5)</span><span class="reason">start</span></div>
-      <div class="step-line"><span class="math-expr">= (2 × 4) / (3 × 5)</span><span class="reason">multiply across</span></div>
+      <div class="problem">Calculate: (2/3) &times; (4/5)</div>
+      <div class="step-line"><span class="math-expr">(2/3) &times; (4/5)</span><span class="reason">start</span></div>
+      <div class="step-line"><span class="math-expr">= (2 &times; 4) / (3 &times; 5)</span><span class="reason">multiply across</span></div>
       <div class="step-line"><span class="math-expr">= 8/15</span><span class="reason">already simplified</span></div>
       <div class="answer">Answer: 8/15</div>
     </div>
     <div class="worked">
       <div class="worked-label">Worked Example: Simplify First (Saves Time)</div>
-      <div class="problem">Calculate: (3/8) × (4/9)</div>
-      <div class="step-line"><span class="math-expr">(3/8) × (4/9)</span><span class="reason">look for common factors first</span></div>
-      <div class="step-line"><span class="math-expr">= (3/9) × (4/8)</span><span class="reason">regroup to see: 3/9 = 1/3, 4/8 = 1/2</span></div>
-      <div class="step-line"><span class="math-expr">= (1/3) × (1/2)</span><span class="reason">cancel before multiplying</span></div>
+      <div class="problem">Calculate: (3/8) &times; (4/9)</div>
+      <div class="step-line"><span class="math-expr">(3/8) &times; (4/9)</span><span class="reason">look for common factors first</span></div>
+      <div class="step-line"><span class="math-expr">= (3/9) &times; (4/8)</span><span class="reason">regroup to see: 3/9 = 1/3, 4/8 = 1/2</span></div>
+      <div class="step-line"><span class="math-expr">= (1/3) &times; (1/2)</span><span class="reason">cancel before multiplying</span></div>
       <div class="step-line"><span class="math-expr">= 1/6</span><span class="reason">much cleaner than 12/72 then reducing</span></div>
       <div class="answer">Answer: 1/6</div>
     </div>
 
     <h3>Rule 2: Dividing Fractions</h3>
-    <p>Flip the second fraction and multiply. "Dividing by a fraction is the same as multiplying by its reciprocal" is the rule, and it always works.</p>
+    <p>Flip the second fraction and multiply. &ldquo;Dividing by a fraction is the same as multiplying by its reciprocal&rdquo; is the rule, and it always works.</p>
     <div class="math-block">
-      (a/b) ÷ (c/d) = (a/b) × (d/c)
+      (a/b) &divide; (c/d) = (a/b) &times; (d/c)
     </div>
     <div class="worked">
       <div class="worked-label">Worked Example</div>
-      <div class="problem">Calculate: (5/6) ÷ (2/3)</div>
-      <div class="step-line"><span class="math-expr">(5/6) ÷ (2/3)</span><span class="reason">start</span></div>
-      <div class="step-line"><span class="math-expr">= (5/6) × (3/2)</span><span class="reason">flip second fraction and multiply</span></div>
+      <div class="problem">Calculate: (5/6) &divide; (2/3)</div>
+      <div class="step-line"><span class="math-expr">(5/6) &divide; (2/3)</span><span class="reason">start</span></div>
+      <div class="step-line"><span class="math-expr">= (5/6) &times; (3/2)</span><span class="reason">flip second fraction and multiply</span></div>
       <div class="step-line"><span class="math-expr">= 15/12</span><span class="reason">multiply across</span></div>
       <div class="step-line"><span class="math-expr">= 5/4</span><span class="reason">simplify: divide both by 3</span></div>
       <div class="answer">Answer: 5/4 (or 1 and 1/4)</div>
@@ -907,7 +1030,7 @@ body {
       <div class="problem">Calculate: (1/4) + (2/3)</div>
       <div class="step-line"><span class="math-expr">(1/4) + (2/3)</span><span class="reason">different denominators: need LCD</span></div>
       <div class="step-line"><span class="math-expr">LCD of 4 and 3 = 12</span><span class="reason">smallest number both divide into</span></div>
-      <div class="step-line"><span class="math-expr">= (3/12) + (8/12)</span><span class="reason">convert: 1/4 × 3/3, 2/3 × 4/4</span></div>
+      <div class="step-line"><span class="math-expr">= (3/12) + (8/12)</span><span class="reason">convert: 1/4 &times; 3/3, 2/3 &times; 4/4</span></div>
       <div class="step-line"><span class="math-expr">= 11/12</span><span class="reason">add numerators</span></div>
       <div class="answer">Answer: 11/12</div>
     </div>
@@ -916,7 +1039,7 @@ body {
     <p>In chemistry, you will calculate concentrations like 0.25 mol/L, which is just 1/4 mol per liter. In biology, you will dilute solutions by factors like 1/10 or 1/100. In physics, you will work with ratios of forces or velocities. In every case, the underlying operation is fraction arithmetic. The students who find these calculations effortless have automated the mechanics. The students who find them stressful are doing fraction arithmetic consciously at the same time they are trying to think about the science.</p>
 
     <div class="callout math">
-      <strong>Quick check on yourself:</strong> Without a calculator, what is (3/4) ÷ (1/2)? If you got 3/2 immediately by flipping and multiplying, you are in good shape. If you had to stop and think for more than a few seconds, the flashcards and quiz in this guide will help you build that speed.
+      <strong>Quick check on yourself:</strong> Without a calculator, what is (3/4) &divide; (1/2)? If you got 3/2 immediately by flipping and multiplying, you are in good shape. If you had to stop and think for more than a few seconds, the flashcards and quiz in this guide will help you build that speed.
     </div>
   </div>
 
@@ -939,21 +1062,21 @@ body {
     <table class="fact-table">
       <thead><tr><th>Problem</th><th>Answer</th><th>Memory Hook</th></tr></thead>
       <tbody>
-        <tr><td class="key">6 × 6</td><td>36</td><td>Six sixes are 36. Say it ten times.</td></tr>
-        <tr><td class="key">6 × 7</td><td>42</td><td>The answer to life, the universe, and everything (Douglas Adams).</td></tr>
-        <tr><td class="key">6 × 8</td><td>48</td><td>6 × 8 = 48: six times eight, forty-eight.</td></tr>
-        <tr><td class="key">6 × 9</td><td>54</td><td>5 + 4 = 9. The digits of 6×9 add to 9.</td></tr>
-        <tr><td class="key">7 × 7</td><td>49</td><td>Seven squared is 49. Near 50.</td></tr>
-        <tr><td class="key">7 × 8</td><td>56</td><td>5, 6, 7, 8: five-six equals seven times eight.</td></tr>
-        <tr><td class="key">7 × 9</td><td>63</td><td>6 + 3 = 9. Digits of 7×9 add to 9.</td></tr>
-        <tr><td class="key">8 × 8</td><td>64</td><td>Eight squared is 64. Like a chessboard.</td></tr>
-        <tr><td class="key">8 × 9</td><td>72</td><td>7 + 2 = 9. Digits of 8×9 add to 9.</td></tr>
-        <tr><td class="key">9 × 9</td><td>81</td><td>Nine squared is 81. Reverse of 18.</td></tr>
+        <tr><td class="key">6 &times; 6</td><td>36</td><td>Six sixes are 36. Say it ten times.</td></tr>
+        <tr><td class="key">6 &times; 7</td><td>42</td><td>The answer to life, the universe, and everything (Douglas Adams).</td></tr>
+        <tr><td class="key">6 &times; 8</td><td>48</td><td>6 &times; 8 = 48: six times eight, forty-eight.</td></tr>
+        <tr><td class="key">6 &times; 9</td><td>54</td><td>5 + 4 = 9. The digits of 6&times;9 add to 9.</td></tr>
+        <tr><td class="key">7 &times; 7</td><td>49</td><td>Seven squared is 49. Near 50.</td></tr>
+        <tr><td class="key">7 &times; 8</td><td>56</td><td>5, 6, 7, 8: five-six equals seven times eight.</td></tr>
+        <tr><td class="key">7 &times; 9</td><td>63</td><td>6 + 3 = 9. Digits of 7&times;9 add to 9.</td></tr>
+        <tr><td class="key">8 &times; 8</td><td>64</td><td>Eight squared is 64. Like a chessboard.</td></tr>
+        <tr><td class="key">8 &times; 9</td><td>72</td><td>7 + 2 = 9. Digits of 8&times;9 add to 9.</td></tr>
+        <tr><td class="key">9 &times; 9</td><td>81</td><td>Nine squared is 81. Reverse of 18.</td></tr>
       </tbody>
     </table>
 
     <div class="callout math">
-      <strong>The 9s shortcut:</strong> For any single-digit number n multiplied by 9, the answer has digits that add to 9, and the tens digit is always (n-1). So 9 × 7: tens digit = 6 (one less than 7), ones digit = 3 (since 6+3=9), answer = 63. This works for all single-digit multiplications by 9.
+      <strong>The 9s shortcut:</strong> For any single-digit number n multiplied by 9, the answer has digits that add to 9, and the tens digit is always (n&minus;1). So 9 &times; 7: tens digit = 6 (one less than 7), ones digit = 3 (since 6+3=9), answer = 63. This works for all single-digit multiplications by 9.
     </div>
 
     <h3>Integer Operations (Positive and Negative Numbers)</h3>
@@ -962,11 +1085,11 @@ body {
     <table class="fact-table">
       <thead><tr><th>Operation</th><th>Rule</th><th>Example</th></tr></thead>
       <tbody>
-        <tr><td><strong>Adding negatives</strong></td><td>Same sign: add magnitudes, keep sign</td><td>(-3) + (-5) = -8</td></tr>
-        <tr><td><strong>Adding mixed signs</strong></td><td>Different signs: subtract magnitudes, keep sign of larger</td><td>(-7) + 4 = -3</td></tr>
-        <tr><td><strong>Subtracting</strong></td><td>Subtracting a negative = adding a positive</td><td>5 - (-3) = 5 + 3 = 8</td></tr>
-        <tr><td><strong>Multiplying/Dividing</strong></td><td>Same signs = positive result</td><td>(-4) × (-3) = 12</td></tr>
-        <tr><td><strong>Multiplying/Dividing</strong></td><td>Different signs = negative result</td><td>(-4) × 3 = -12</td></tr>
+        <tr><td><strong>Adding negatives</strong></td><td>Same sign: add magnitudes, keep sign</td><td>(&minus;3) + (&minus;5) = &minus;8</td></tr>
+        <tr><td><strong>Adding mixed signs</strong></td><td>Different signs: subtract magnitudes, keep sign of larger</td><td>(&minus;7) + 4 = &minus;3</td></tr>
+        <tr><td><strong>Subtracting</strong></td><td>Subtracting a negative = adding a positive</td><td>5 &minus; (&minus;3) = 5 + 3 = 8</td></tr>
+        <tr><td><strong>Multiplying/Dividing</strong></td><td>Same signs = positive result</td><td>(&minus;4) &times; (&minus;3) = 12</td></tr>
+        <tr><td><strong>Multiplying/Dividing</strong></td><td>Different signs = negative result</td><td>(&minus;4) &times; 3 = &minus;12</td></tr>
       </tbody>
     </table>
 
@@ -976,16 +1099,16 @@ body {
     <table class="fact-table">
       <thead><tr><th>Square</th><th>Value</th><th>Square Root</th><th>Value</th></tr></thead>
       <tbody>
-        <tr><td class="key">2²</td><td>4</td><td class="key">√4</td><td>2</td></tr>
-        <tr><td class="key">3²</td><td>9</td><td class="key">√9</td><td>3</td></tr>
-        <tr><td class="key">4²</td><td>16</td><td class="key">√16</td><td>4</td></tr>
-        <tr><td class="key">5²</td><td>25</td><td class="key">√25</td><td>5</td></tr>
-        <tr><td class="key">6²</td><td>36</td><td class="key">√36</td><td>6</td></tr>
-        <tr><td class="key">7²</td><td>49</td><td class="key">√49</td><td>7</td></tr>
-        <tr><td class="key">8²</td><td>64</td><td class="key">√64</td><td>8</td></tr>
-        <tr><td class="key">9²</td><td>81</td><td class="key">√81</td><td>9</td></tr>
-        <tr><td class="key">10²</td><td>100</td><td class="key">√100</td><td>10</td></tr>
-        <tr><td class="key">12²</td><td>144</td><td class="key">√144</td><td>12</td></tr>
+        <tr><td class="key">2&sup2;</td><td>4</td><td class="key">&radic;4</td><td>2</td></tr>
+        <tr><td class="key">3&sup2;</td><td>9</td><td class="key">&radic;9</td><td>3</td></tr>
+        <tr><td class="key">4&sup2;</td><td>16</td><td class="key">&radic;16</td><td>4</td></tr>
+        <tr><td class="key">5&sup2;</td><td>25</td><td class="key">&radic;25</td><td>5</td></tr>
+        <tr><td class="key">6&sup2;</td><td>36</td><td class="key">&radic;36</td><td>6</td></tr>
+        <tr><td class="key">7&sup2;</td><td>49</td><td class="key">&radic;49</td><td>7</td></tr>
+        <tr><td class="key">8&sup2;</td><td>64</td><td class="key">&radic;64</td><td>8</td></tr>
+        <tr><td class="key">9&sup2;</td><td>81</td><td class="key">&radic;81</td><td>9</td></tr>
+        <tr><td class="key">10&sup2;</td><td>100</td><td class="key">&radic;100</td><td>10</td></tr>
+        <tr><td class="key">12&sup2;</td><td>144</td><td class="key">&radic;144</td><td>12</td></tr>
       </tbody>
     </table>
 
@@ -994,11 +1117,11 @@ body {
 
     <div class="worked">
       <div class="worked-label">Estimation in Practice</div>
-      <div class="problem">You calculate the molar mass of glucose (C₆H₁₂O₆) and get 1800 g/mol. Is this reasonable?</div>
-      <div class="step-line"><span class="math-expr">C: 6 atoms × ~12 g/mol = ~72</span><span class="reason">quick mental estimate</span></div>
-      <div class="step-line"><span class="math-expr">H: 12 atoms × ~1 g/mol = ~12</span><span class="reason">quick mental estimate</span></div>
-      <div class="step-line"><span class="math-expr">O: 6 atoms × ~16 g/mol = ~96</span><span class="reason">quick mental estimate</span></div>
-      <div class="step-line"><span class="math-expr">Total ≈ 72 + 12 + 96 = 180 g/mol</span><span class="reason">estimate says ~180</span></div>
+      <div class="problem">You calculate the molar mass of glucose (C&#x2086;H&#x2081;&#x2082;O&#x2086;) and get 1800 g/mol. Is this reasonable?</div>
+      <div class="step-line"><span class="math-expr">C: 6 atoms &times; ~12 g/mol = ~72</span><span class="reason">quick mental estimate</span></div>
+      <div class="step-line"><span class="math-expr">H: 12 atoms &times; ~1 g/mol = ~12</span><span class="reason">quick mental estimate</span></div>
+      <div class="step-line"><span class="math-expr">O: 6 atoms &times; ~16 g/mol = ~96</span><span class="reason">quick mental estimate</span></div>
+      <div class="step-line"><span class="math-expr">Total &asymp; 72 + 12 + 96 = 180 g/mol</span><span class="reason">estimate says ~180</span></div>
       <div class="answer">1800 is off by a factor of 10. Something went wrong. Correct answer: 180 g/mol.</div>
     </div>
 
@@ -1052,27 +1175,27 @@ body {
       <div class="problem">The ideal gas law is PV = nRT. Solve for T (temperature).</div>
       <div class="step-line"><span class="math-expr">PV = nRT</span><span class="reason">start: T is multiplied by n and R</span></div>
       <div class="step-line"><span class="math-expr">PV / (nR) = T</span><span class="reason">divide both sides by nR</span></div>
-      <div class="answer">T = PV / (nR) — divide the known quantities to find temperature</div>
+      <div class="answer">T = PV / (nR) &mdash; divide the known quantities to find temperature</div>
     </div>
 
     <div class="worked">
       <div class="worked-label">Worked Example: Molarity Formula</div>
       <div class="problem">Molarity M = moles / liters. You know M and liters, solve for moles.</div>
       <div class="step-line"><span class="math-expr">M = moles / liters</span><span class="reason">start</span></div>
-      <div class="step-line"><span class="math-expr">M × liters = moles</span><span class="reason">multiply both sides by liters</span></div>
-      <div class="answer">moles = M × liters</div>
+      <div class="step-line"><span class="math-expr">M &times; liters = moles</span><span class="reason">multiply both sides by liters</span></div>
+      <div class="answer">moles = M &times; liters</div>
     </div>
 
     <h3>Proportions and Cross-Multiplication</h3>
-    <p>A proportion says two ratios are equal: a/b = c/d. Cross-multiplying (a × d = b × c) lets you solve for any one missing value when the other three are known. This appears constantly in stoichiometry, dilution problems, and dosage calculations.</p>
+    <p>A proportion says two ratios are equal: a/b = c/d. Cross-multiplying (a &times; d = b &times; c) lets you solve for any one missing value when the other three are known. This appears constantly in stoichiometry, dilution problems, and dosage calculations.</p>
 
     <div class="worked">
       <div class="worked-label">Worked Example: Proportion Setup</div>
-      <div class="problem">If 2 moles of H₂ reacts with 1 mole of O₂, how many moles of O₂ are needed for 5 moles of H₂?</div>
-      <div class="step-line"><span class="math-expr">2 mol H₂ / 1 mol O₂ = 5 mol H₂ / x mol O₂</span><span class="reason">set up proportion</span></div>
-      <div class="step-line"><span class="math-expr">2x = 5 × 1</span><span class="reason">cross-multiply</span></div>
+      <div class="problem">If 2 moles of H&#x2082; reacts with 1 mole of O&#x2082;, how many moles of O&#x2082; are needed for 5 moles of H&#x2082;?</div>
+      <div class="step-line"><span class="math-expr">2 mol H&#x2082; / 1 mol O&#x2082; = 5 mol H&#x2082; / x mol O&#x2082;</span><span class="reason">set up proportion</span></div>
+      <div class="step-line"><span class="math-expr">2x = 5 &times; 1</span><span class="reason">cross-multiply</span></div>
       <div class="step-line"><span class="math-expr">x = 2.5</span><span class="reason">divide both sides by 2</span></div>
-      <div class="answer">2.5 moles of O₂ are needed</div>
+      <div class="answer">2.5 moles of O&#x2082; are needed</div>
     </div>
 
     <h3>Order of Operations: PEMDAS</h3>
@@ -1080,9 +1203,9 @@ body {
 
     <div class="worked">
       <div class="worked-label">Worked Example: Order of Operations Matters</div>
-      <div class="problem">Evaluate: 3 + 4 × 2² − 6 ÷ 3</div>
-      <div class="step-line"><span class="math-expr">= 3 + 4 × 4 − 6 ÷ 3</span><span class="reason">exponents first: 2² = 4</span></div>
-      <div class="step-line"><span class="math-expr">= 3 + 16 − 2</span><span class="reason">multiplication and division: left to right</span></div>
+      <div class="problem">Evaluate: 3 + 4 &times; 2&sup2; &minus; 6 &divide; 3</div>
+      <div class="step-line"><span class="math-expr">= 3 + 4 &times; 4 &minus; 6 &divide; 3</span><span class="reason">exponents first: 2&sup2; = 4</span></div>
+      <div class="step-line"><span class="math-expr">= 3 + 16 &minus; 2</span><span class="reason">multiplication and division: left to right</span></div>
       <div class="step-line"><span class="math-expr">= 17</span><span class="reason">addition and subtraction: left to right</span></div>
       <div class="answer">Answer: 17 (common wrong answer: 11, from doing addition first)</div>
     </div>
@@ -1116,8 +1239,8 @@ body {
     <div class="worked">
       <div class="worked-label">Worked Example: Single Conversion</div>
       <div class="problem">Convert 2.5 liters to milliliters.</div>
-      <div class="step-line"><span class="math-expr">2.5 L × (1000 mL / 1 L)</span><span class="reason">place L in denominator to cancel</span></div>
-      <div class="step-line"><span class="math-expr">= 2.5 × 1000 mL</span><span class="reason">L cancels, mL remains</span></div>
+      <div class="step-line"><span class="math-expr">2.5 L &times; (1000 mL / 1 L)</span><span class="reason">place L in denominator to cancel</span></div>
+      <div class="step-line"><span class="math-expr">= 2.5 &times; 1000 mL</span><span class="reason">L cancels, mL remains</span></div>
       <div class="step-line"><span class="math-expr">= 2500 mL</span><span class="reason">done</span></div>
       <div class="answer">2500 mL</div>
     </div>
@@ -1125,11 +1248,11 @@ body {
     <div class="worked">
       <div class="worked-label">Worked Example: Chain Conversion</div>
       <div class="problem">Convert 60 miles per hour to meters per second. (1 mile = 1609 m, 1 hour = 3600 s)</div>
-      <div class="step-line"><span class="math-expr">60 mi/hr × (1609 m / 1 mi) × (1 hr / 3600 s)</span><span class="reason">chain two factors</span></div>
-      <div class="step-line"><span class="math-expr">= (60 × 1609) / 3600 m/s</span><span class="reason">miles cancel, hours cancel</span></div>
-      <div class="step-line"><span class="math-expr">≈ 96,540 / 3600 m/s</span><span class="reason">arithmetic</span></div>
-      <div class="step-line"><span class="math-expr">≈ 26.8 m/s</span><span class="reason">final answer</span></div>
-      <div class="answer">60 mph ≈ 26.8 m/s</div>
+      <div class="step-line"><span class="math-expr">60 mi/hr &times; (1609 m / 1 mi) &times; (1 hr / 3600 s)</span><span class="reason">chain two factors</span></div>
+      <div class="step-line"><span class="math-expr">= (60 &times; 1609) / 3600 m/s</span><span class="reason">miles cancel, hours cancel</span></div>
+      <div class="step-line"><span class="math-expr">&asymp; 96,540 / 3600 m/s</span><span class="reason">arithmetic</span></div>
+      <div class="step-line"><span class="math-expr">&asymp; 26.8 m/s</span><span class="reason">final answer</span></div>
+      <div class="answer">60 mph &asymp; 26.8 m/s</div>
     </div>
 
     <h3>Metric Prefixes You Must Know</h3>
@@ -1138,28 +1261,28 @@ body {
     <table class="fact-table">
       <thead><tr><th>Prefix</th><th>Symbol</th><th>Meaning</th><th>Example</th></tr></thead>
       <tbody>
-        <tr><td class="key">giga-</td><td>G</td><td>10⁹ (billion)</td><td>1 GB = 10⁹ bytes</td></tr>
-        <tr><td class="key">mega-</td><td>M</td><td>10⁶ (million)</td><td>1 MHz = 10⁶ Hz</td></tr>
-        <tr><td class="key">kilo-</td><td>k</td><td>10³ (thousand)</td><td>1 km = 1000 m</td></tr>
-        <tr><td class="key">base unit</td><td>—</td><td>10⁰ (one)</td><td>meter, gram, liter, second</td></tr>
-        <tr><td class="key">deci-</td><td>d</td><td>10⁻¹ (one-tenth)</td><td>1 dL = 0.1 L</td></tr>
-        <tr><td class="key">centi-</td><td>c</td><td>10⁻² (one-hundredth)</td><td>1 cm = 0.01 m</td></tr>
-        <tr><td class="key">milli-</td><td>m</td><td>10⁻³ (one-thousandth)</td><td>1 mg = 0.001 g</td></tr>
-        <tr><td class="key">micro-</td><td>µ</td><td>10⁻⁶ (one-millionth)</td><td>1 µL = 10⁻⁶ L</td></tr>
-        <tr><td class="key">nano-</td><td>n</td><td>10⁻⁹ (one-billionth)</td><td>1 nm = 10⁻⁹ m</td></tr>
+        <tr><td class="key">giga-</td><td>G</td><td>10&sup9; (billion)</td><td>1 GB = 10&sup9; bytes</td></tr>
+        <tr><td class="key">mega-</td><td>M</td><td>10&#x2076; (million)</td><td>1 MHz = 10&#x2076; Hz</td></tr>
+        <tr><td class="key">kilo-</td><td>k</td><td>10&sup3; (thousand)</td><td>1 km = 1000 m</td></tr>
+        <tr><td class="key">base unit</td><td>&mdash;</td><td>10&#x2070; (one)</td><td>meter, gram, liter, second</td></tr>
+        <tr><td class="key">deci-</td><td>d</td><td>10&#x207B;&#x00B9; (one-tenth)</td><td>1 dL = 0.1 L</td></tr>
+        <tr><td class="key">centi-</td><td>c</td><td>10&#x207B;&sup2; (one-hundredth)</td><td>1 cm = 0.01 m</td></tr>
+        <tr><td class="key">milli-</td><td>m</td><td>10&#x207B;&sup3; (one-thousandth)</td><td>1 mg = 0.001 g</td></tr>
+        <tr><td class="key">micro-</td><td>&micro;</td><td>10&#x207B;&#x2076; (one-millionth)</td><td>1 &micro;L = 10&#x207B;&#x2076; L</td></tr>
+        <tr><td class="key">nano-</td><td>n</td><td>10&#x207B;&#x2079; (one-billionth)</td><td>1 nm = 10&#x207B;&#x2079; m</td></tr>
       </tbody>
     </table>
 
     <div class="callout math">
-      <strong>The staircase trick for metric conversions:</strong> Each step up the prefix ladder multiplies by 10. Each step down divides by 10. From milli- to the base unit is 3 steps up (× 1000). From the base unit to micro- is 3 steps down (÷ 1000 or × 10⁻³). Count the steps and adjust the decimal point.
+      <strong>The staircase trick for metric conversions:</strong> Each step up the prefix ladder multiplies by 10. Each step down divides by 10. From milli- to the base unit is 3 steps up (&times; 1000). From the base unit to micro- is 3 steps down (&divide; 1000 or &times; 10&#x207B;&sup3;). Count the steps and adjust the decimal point.
     </div>
 
     <div class="worked">
       <div class="worked-label">Worked Example: Metric Prefix Conversion</div>
-      <div class="problem">Convert 350 micrograms (µg) to milligrams (mg).</div>
-      <div class="step-line"><span class="math-expr">µg to mg: one step up the ladder (× 10⁻¹)</span><span class="reason">micro is 3 below base, milli is 3 below base... actually µg to mg is 3 steps</span></div>
-      <div class="step-line"><span class="math-expr">350 µg × (1 mg / 1000 µg)</span><span class="reason">1000 µg = 1 mg</span></div>
-      <div class="step-line"><span class="math-expr">= 0.350 mg</span><span class="reason">350 ÷ 1000</span></div>
+      <div class="problem">Convert 350 micrograms (&micro;g) to milligrams (mg).</div>
+      <div class="step-line"><span class="math-expr">&micro;g to mg: one step up the ladder (&times; 10&#x207B;&#x00B9;)</span><span class="reason">micro is 3 below base, milli is 3 below base&hellip; actually &micro;g to mg is 3 steps</span></div>
+      <div class="step-line"><span class="math-expr">350 &micro;g &times; (1 mg / 1000 &micro;g)</span><span class="reason">1000 &micro;g = 1 mg</span></div>
+      <div class="step-line"><span class="math-expr">= 0.350 mg</span><span class="reason">350 &divide; 1000</span></div>
       <div class="answer">0.350 mg</div>
     </div>
 
@@ -1181,10 +1304,10 @@ body {
 
   <div class="card">
     <h2>Scientific Notation</h2>
-    <p>Science deals with numbers that are inconveniently large or small. The mass of a proton is 0.00000000000000000000000000167 kg. Avogadro's number is 602,214,076,000,000,000,000,000. Writing these out in full is impractical and error-prone. Scientific notation is the solution: a compact, standardized way to express any number as a coefficient times a power of ten.</p>
+    <p>Science deals with numbers that are inconveniently large or small. The mass of a proton is 0.00000000000000000000000000167 kg. Avogadro&rsquo;s number is 602,214,076,000,000,000,000,000. Writing these out in full is impractical and error-prone. Scientific notation is the solution: a compact, standardized way to express any number as a coefficient times a power of ten.</p>
 
     <div class="math-block">
-      N × 10ˣ &nbsp; where &nbsp; 1 ≤ N &lt; 10
+      N &times; 10&#x02E3; &nbsp; where &nbsp; 1 &le; N &lt; 10
     </div>
     <p>The coefficient N is always a number between 1 and 10 (including 1 but not including 10). The exponent x tells you how many places the decimal point moved.</p>
 
@@ -1194,65 +1317,65 @@ body {
       <div class="problem">Write 4,500,000 in scientific notation.</div>
       <div class="step-line"><span class="math-expr">4,500,000</span><span class="reason">move decimal left until one digit before it</span></div>
       <div class="step-line"><span class="math-expr">4.5</span><span class="reason">moved decimal 6 places left</span></div>
-      <div class="step-line"><span class="math-expr">= 4.5 × 10⁶</span><span class="reason">positive exponent for large numbers</span></div>
-      <div class="answer">4.5 × 10⁶</div>
+      <div class="step-line"><span class="math-expr">= 4.5 &times; 10&#x2076;</span><span class="reason">positive exponent for large numbers</span></div>
+      <div class="answer">4.5 &times; 10&#x2076;</div>
     </div>
     <div class="worked">
       <div class="worked-label">Worked Example: Small Number</div>
       <div class="problem">Write 0.000072 in scientific notation.</div>
       <div class="step-line"><span class="math-expr">0.000072</span><span class="reason">move decimal right until one non-zero digit before it</span></div>
       <div class="step-line"><span class="math-expr">7.2</span><span class="reason">moved decimal 5 places right</span></div>
-      <div class="step-line"><span class="math-expr">= 7.2 × 10⁻⁵</span><span class="reason">negative exponent for small numbers</span></div>
-      <div class="answer">7.2 × 10⁻⁵</div>
+      <div class="step-line"><span class="math-expr">= 7.2 &times; 10&#x207B;&#x2075;</span><span class="reason">negative exponent for small numbers</span></div>
+      <div class="answer">7.2 &times; 10&#x207B;&#x2075;</div>
     </div>
 
     <h3>Multiplying in Scientific Notation</h3>
     <p>Multiply the coefficients. Add the exponents. Adjust if the coefficient is not between 1 and 10.</p>
     <div class="math-block">
-      (A × 10ˣ) × (B × 10ʸ) = (A × B) × 10^(x+y)
+      (A &times; 10&#x02E3;) &times; (B &times; 10&#x02B8;) = (A &times; B) &times; 10^(x+y)
     </div>
     <div class="worked">
       <div class="worked-label">Worked Example</div>
-      <div class="problem">Calculate: (3.0 × 10⁴) × (2.0 × 10³)</div>
-      <div class="step-line"><span class="math-expr">= (3.0 × 2.0) × 10^(4+3)</span><span class="reason">multiply coefficients, add exponents</span></div>
-      <div class="step-line"><span class="math-expr">= 6.0 × 10⁷</span><span class="reason">done, coefficient is between 1 and 10</span></div>
-      <div class="answer">6.0 × 10⁷</div>
+      <div class="problem">Calculate: (3.0 &times; 10&#x2074;) &times; (2.0 &times; 10&sup3;)</div>
+      <div class="step-line"><span class="math-expr">= (3.0 &times; 2.0) &times; 10^(4+3)</span><span class="reason">multiply coefficients, add exponents</span></div>
+      <div class="step-line"><span class="math-expr">= 6.0 &times; 10&#x2077;</span><span class="reason">done, coefficient is between 1 and 10</span></div>
+      <div class="answer">6.0 &times; 10&#x2077;</div>
     </div>
     <div class="worked">
       <div class="worked-label">Worked Example: Adjust After</div>
-      <div class="problem">Calculate: (5.0 × 10⁶) × (4.0 × 10³)</div>
-      <div class="step-line"><span class="math-expr">= (5.0 × 4.0) × 10^(6+3)</span><span class="reason">multiply, add exponents</span></div>
-      <div class="step-line"><span class="math-expr">= 20.0 × 10⁹</span><span class="reason">but 20.0 is not between 1 and 10</span></div>
-      <div class="step-line"><span class="math-expr">= 2.0 × 10¹⁰</span><span class="reason">move decimal left one place, add 1 to exponent</span></div>
-      <div class="answer">2.0 × 10¹⁰</div>
+      <div class="problem">Calculate: (5.0 &times; 10&#x2076;) &times; (4.0 &times; 10&sup3;)</div>
+      <div class="step-line"><span class="math-expr">= (5.0 &times; 4.0) &times; 10^(6+3)</span><span class="reason">multiply, add exponents</span></div>
+      <div class="step-line"><span class="math-expr">= 20.0 &times; 10&#x2079;</span><span class="reason">but 20.0 is not between 1 and 10</span></div>
+      <div class="step-line"><span class="math-expr">= 2.0 &times; 10&#x00B9;&#x2070;</span><span class="reason">move decimal left one place, add 1 to exponent</span></div>
+      <div class="answer">2.0 &times; 10&#x00B9;&#x2070;</div>
     </div>
 
     <h3>Dividing in Scientific Notation</h3>
     <p>Divide the coefficients. Subtract the exponents. Adjust if needed.</p>
     <div class="math-block">
-      (A × 10ˣ) ÷ (B × 10ʸ) = (A ÷ B) × 10^(x−y)
+      (A &times; 10&#x02E3;) &divide; (B &times; 10&#x02B8;) = (A &divide; B) &times; 10^(x&minus;y)
     </div>
     <div class="worked">
       <div class="worked-label">Worked Example</div>
-      <div class="problem">Calculate: (8.4 × 10⁸) ÷ (2.1 × 10³)</div>
-      <div class="step-line"><span class="math-expr">= (8.4 ÷ 2.1) × 10^(8−3)</span><span class="reason">divide coefficients, subtract exponents</span></div>
-      <div class="step-line"><span class="math-expr">= 4.0 × 10⁵</span><span class="reason">done</span></div>
-      <div class="answer">4.0 × 10⁵</div>
+      <div class="problem">Calculate: (8.4 &times; 10&#x2078;) &divide; (2.1 &times; 10&sup3;)</div>
+      <div class="step-line"><span class="math-expr">= (8.4 &divide; 2.1) &times; 10^(8&minus;3)</span><span class="reason">divide coefficients, subtract exponents</span></div>
+      <div class="step-line"><span class="math-expr">= 4.0 &times; 10&#x2075;</span><span class="reason">done</span></div>
+      <div class="answer">4.0 &times; 10&#x2075;</div>
     </div>
 
     <h3>Adding and Subtracting in Scientific Notation</h3>
     <p>This is the one that catches students. You cannot add numbers in scientific notation unless the exponents match first. Convert to the same power of ten, then add or subtract the coefficients.</p>
     <div class="worked">
       <div class="worked-label">Worked Example</div>
-      <div class="problem">Calculate: (3.2 × 10⁵) + (4.6 × 10⁴)</div>
-      <div class="step-line"><span class="math-expr">= (3.2 × 10⁵) + (0.46 × 10⁵)</span><span class="reason">convert 4.6 × 10⁴ to same exponent</span></div>
-      <div class="step-line"><span class="math-expr">= (3.2 + 0.46) × 10⁵</span><span class="reason">now add coefficients</span></div>
-      <div class="step-line"><span class="math-expr">= 3.66 × 10⁵</span><span class="reason">done</span></div>
-      <div class="answer">3.66 × 10⁵</div>
+      <div class="problem">Calculate: (3.2 &times; 10&#x2075;) + (4.6 &times; 10&#x2074;)</div>
+      <div class="step-line"><span class="math-expr">= (3.2 &times; 10&#x2075;) + (0.46 &times; 10&#x2075;)</span><span class="reason">convert 4.6 &times; 10&#x2074; to same exponent</span></div>
+      <div class="step-line"><span class="math-expr">= (3.2 + 0.46) &times; 10&#x2075;</span><span class="reason">now add coefficients</span></div>
+      <div class="step-line"><span class="math-expr">= 3.66 &times; 10&#x2075;</span><span class="reason">done</span></div>
+      <div class="answer">3.66 &times; 10&#x2075;</div>
     </div>
 
     <div class="callout math">
-      <strong>Why this matters in chemistry:</strong> Avogadro's number (6.022 × 10²³), the charge on an electron (1.6 × 10⁻¹⁹ C), the mass of a hydrogen atom (1.67 × 10⁻²⁷ kg): you will use these numbers in calculations. If scientific notation arithmetic is slow or uncertain, every calculation involving these constants will take longer and introduce more chances for error.
+      <strong>Why this matters in chemistry:</strong> Avogadro&rsquo;s number (6.022 &times; 10&#x00B2;&#x00B3;), the charge on an electron (1.6 &times; 10&#x207B;&#x00B9;&#x2079; C), the mass of a hydrogen atom (1.67 &times; 10&#x207B;&#x00B2;&#x2077; kg): you will use these numbers in calculations. If scientific notation arithmetic is slow or uncertain, every calculation involving these constants will take longer and introduce more chances for error.
     </div>
 
     <h3>Significant Figures: A Brief, Practical Guide</h3>
@@ -1290,13 +1413,13 @@ body {
       <div class="quiz-explanation" id="q-explanation"></div>
       <div class="quiz-nav">
         <div class="quiz-progress" id="q-progress">Question 1 of 30</div>
-        <button class="quiz-btn" id="q-next" onclick="nextQuestion()" disabled>Next</button>
+        <button type="button" class="quiz-btn" id="q-next" onclick="nextQuestion()" disabled>Next</button>
       </div>
     </div>
     <div class="quiz-final" id="quiz-final">
       <div class="quiz-final-score" id="final-score"></div>
       <div class="quiz-final-msg" id="final-msg"></div>
-      <button class="quiz-restart" onclick="startQuiz()">Try Again</button>
+      <button type="button" class="quiz-restart" onclick="startQuiz()">Try Again</button>
     </div>
   </div>
 </div>
@@ -1307,41 +1430,51 @@ body {
     <h2>Flashcards</h2>
     <p>Click a card to flip it. Use the category filters to focus on a specific topic. Tap through all cards at least twice until every answer feels immediate.</p>
     <div class="flashcard-controls" id="fc-filters"></div>
-    <div class="flashcard-scene" onclick="flipCard()">
+    <div class="flashcard-scene"
+         role="button"
+         tabindex="0"
+         id="fc-scene"
+         aria-label="Flashcard — press Space or Enter to flip"
+         onclick="flipCard(this)"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();flipCard(this);}">
       <div class="flashcard" id="fc-card">
         <div class="fc-face fc-front">
-          <div class="fc-label">Question</div>
+          <div class="fc-label" aria-hidden="true">Question</div>
           <div class="fc-content" id="fc-front-text"></div>
-          <div class="fc-hint">Click to reveal answer</div>
+          <div class="fc-hint" aria-hidden="true">Click to reveal answer</div>
         </div>
         <div class="fc-face fc-back">
-          <div class="fc-label">Answer</div>
+          <div class="fc-label" aria-hidden="true">Answer</div>
           <div class="fc-content" id="fc-back-text"></div>
         </div>
       </div>
     </div>
     <div class="fc-nav">
-      <button class="fc-btn secondary" onclick="fcNav(-1)">&#8592; Prev</button>
+      <button type="button" class="fc-btn secondary" onclick="fcNav(-1)">&#8592; Prev</button>
       <div class="fc-position" id="fc-pos"></div>
-      <button class="fc-btn" onclick="fcNav(1)">Next &#8594;</button>
+      <button type="button" class="fc-btn" onclick="fcNav(1)">Next &#8594;</button>
     </div>
   </div>
 </div>
 
 </div><!-- end container -->
 
-<div class="site-footer">
+<footer class="site-footer">
   Foundations: Closing the Gap &mdash; Free supplemental resource. Not affiliated with any university or publisher.<br>
   Always verify content against your official course materials.
-</div>
+</footer>
 
 <script>
 // TAB NAVIGATION
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', function() {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+    });
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     this.classList.add('active');
+    this.setAttribute('aria-selected', 'true');
     document.getElementById('panel-' + this.dataset.tab).classList.add('active');
     window.scrollTo({ top: document.querySelector('.tab-nav').offsetTop - 2, behavior: 'smooth' });
     if (this.dataset.tab === 'quiz' && !quizStarted) startQuiz();
@@ -1351,46 +1484,49 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 
 // DISCLAIMER
 function toggleDisc() {
-  document.getElementById('disc').classList.toggle('open');
+  const wrap = document.getElementById('disc');
+  const btn = wrap.querySelector('.disclaimer-toggle');
+  wrap.classList.toggle('open');
+  btn.setAttribute('aria-expanded', wrap.classList.contains('open') ? 'true' : 'false');
 }
 
 // ═══ QUIZ DATA ═══
 const questions = [
   // FRACTIONS
-  { cat: 'Fractions', q: 'Calculate: (3/4) × (8/9)', opts: ['2/3', '24/36', '11/13', '1/3'], ans: 0, exp: 'Multiply across: (3×8)/(4×9) = 24/36. Simplify by dividing both by 12: 2/3.' },
-  { cat: 'Fractions', q: 'Calculate: (5/6) ÷ (10/3)', opts: ['50/18', '1/4', '15/60', '2/5'], ans: 1, exp: 'Flip and multiply: (5/6) × (3/10) = 15/60 = 1/4.' },
+  { cat: 'Fractions', q: 'Calculate: (3/4) \u00d7 (8/9)', opts: ['2/3', '24/36', '11/13', '1/3'], ans: 0, exp: 'Multiply across: (3\u00d78)/(4\u00d79) = 24/36. Simplify by dividing both by 12: 2/3.' },
+  { cat: 'Fractions', q: 'Calculate: (5/6) \u00f7 (10/3)', opts: ['50/18', '1/4', '15/60', '2/5'], ans: 1, exp: 'Flip and multiply: (5/6) \u00d7 (3/10) = 15/60 = 1/4.' },
   { cat: 'Fractions', q: 'Calculate: (1/3) + (1/4)', opts: ['2/7', '7/12', '4/12', '1/6'], ans: 1, exp: 'LCD of 3 and 4 is 12. Convert: 4/12 + 3/12 = 7/12.' },
   { cat: 'Fractions', q: 'Calculate: (7/8) - (1/4)', opts: ['6/4', '5/8', '6/8', '3/4'], ans: 1, exp: 'Convert 1/4 to 2/8. Then 7/8 - 2/8 = 5/8.' },
-  { cat: 'Fractions', q: 'Simplify: 36/48', opts: ['4/6', '3/4', '6/8', '9/12'], ans: 1, exp: 'GCF of 36 and 48 is 12. 36÷12 = 3, 48÷12 = 4. Answer: 3/4.' },
+  { cat: 'Fractions', q: 'Simplify: 36/48', opts: ['4/6', '3/4', '6/8', '9/12'], ans: 1, exp: 'GCF of 36 and 48 is 12. 36\u00f712 = 3, 48\u00f712 = 4. Answer: 3/4.' },
   { cat: 'Fractions', q: 'What is the reciprocal of 2/5?', opts: ['5/2', '2/5', '-2/5', '1/10'], ans: 0, exp: 'The reciprocal flips numerator and denominator: 2/5 becomes 5/2.' },
   // NUMBER FACTS
-  { cat: 'Number Facts', q: 'What is 7 × 8?', opts: ['54', '56', '48', '63'], ans: 1, exp: '5, 6, 7, 8: five-six = seven times eight. 7 × 8 = 56.' },
-  { cat: 'Number Facts', q: 'What is 8 × 9?', opts: ['72', '81', '63', '64'], ans: 0, exp: '8 × 9 = 72. Check: 7 + 2 = 9 (digits of a 9× answer always sum to 9).' },
-  { cat: 'Number Facts', q: 'What is 6 × 7?', opts: ['48', '42', '36', '49'], ans: 1, exp: '6 × 7 = 42. The answer to life, the universe, and everything.' },
-  { cat: 'Number Facts', q: 'What is (-4) × (-6)?', opts: ['-24', '24', '-10', '10'], ans: 1, exp: 'Same signs multiply to a positive result. (-4) × (-6) = +24.' },
-  { cat: 'Number Facts', q: 'What is 5 - (-8)?', opts: ['-3', '3', '13', '-13'], ans: 2, exp: 'Subtracting a negative is the same as adding a positive. 5 - (-8) = 5 + 8 = 13.' },
-  { cat: 'Number Facts', q: 'What is 9²?', opts: ['18', '81', '72', '99'], ans: 1, exp: '9 × 9 = 81. Note: 8 + 1 = 9, and it is the reverse of 18.' },
-  { cat: 'Number Facts', q: 'What is √64?', opts: ['6', '7', '8', '9'], ans: 2, exp: '8 × 8 = 64, so √64 = 8.' },
-  { cat: 'Number Facts', q: 'Estimate: 48 × 52 is closest to?', opts: ['2000', '2400', '2500', '3000'], ans: 2, exp: 'Approximately 50 × 50 = 2500. (Exact answer is 2496, very close to estimate.)' },
+  { cat: 'Number Facts', q: 'What is 7 \u00d7 8?', opts: ['54', '56', '48', '63'], ans: 1, exp: '5, 6, 7, 8: five-six = seven times eight. 7 \u00d7 8 = 56.' },
+  { cat: 'Number Facts', q: 'What is 8 \u00d7 9?', opts: ['72', '81', '63', '64'], ans: 0, exp: '8 \u00d7 9 = 72. Check: 7 + 2 = 9 (digits of a 9\u00d7 answer always sum to 9).' },
+  { cat: 'Number Facts', q: 'What is 6 \u00d7 7?', opts: ['48', '42', '36', '49'], ans: 1, exp: '6 \u00d7 7 = 42. The answer to life, the universe, and everything.' },
+  { cat: 'Number Facts', q: 'What is (\u22124) \u00d7 (\u22126)?', opts: ['\u221224', '24', '\u221210', '10'], ans: 1, exp: 'Same signs multiply to a positive result. (\u22124) \u00d7 (\u22126) = +24.' },
+  { cat: 'Number Facts', q: 'What is 5 \u2212 (\u22128)?', opts: ['\u22123', '3', '13', '\u221213'], ans: 2, exp: 'Subtracting a negative is the same as adding a positive. 5 \u2212 (\u22128) = 5 + 8 = 13.' },
+  { cat: 'Number Facts', q: 'What is 9\u00b2?', opts: ['18', '81', '72', '99'], ans: 1, exp: '9 \u00d7 9 = 81. Note: 8 + 1 = 9, and it is the reverse of 18.' },
+  { cat: 'Number Facts', q: 'What is \u221a64?', opts: ['6', '7', '8', '9'], ans: 2, exp: '8 \u00d7 8 = 64, so \u221a64 = 8.' },
+  { cat: 'Number Facts', q: 'Estimate: 48 \u00d7 52 is closest to?', opts: ['2000', '2400', '2500', '3000'], ans: 2, exp: 'Approximately 50 \u00d7 50 = 2500. (Exact answer is 2496, very close to estimate.)' },
   // ALGEBRA
   { cat: 'Algebra', q: 'Solve for x: 4x = 36', opts: ['x = 9', 'x = 32', 'x = 40', 'x = 4'], ans: 0, exp: 'Divide both sides by 4: x = 36/4 = 9.' },
   { cat: 'Algebra', q: 'Solve for x: 2x + 5 = 17', opts: ['x = 6', 'x = 11', 'x = 7', 'x = 4'], ans: 0, exp: 'Subtract 5 from both sides: 2x = 12. Divide by 2: x = 6.' },
   { cat: 'Algebra', q: 'The formula is PV = nRT. Solve for n.', opts: ['n = PVT/R', 'n = RT/PV', 'n = PV/RT', 'n = RTP/V'], ans: 2, exp: 'Divide both sides by RT: n = PV / RT.' },
-  { cat: 'Algebra', q: 'Molarity M = moles/liters. If M = 2 and liters = 0.5, find moles.', opts: ['0.25 mol', '4 mol', '1 mol', '2.5 mol'], ans: 2, exp: 'moles = M × liters = 2 × 0.5 = 1 mol.' },
-  { cat: 'Algebra', q: 'Evaluate: 2 + 3 × 4²', opts: ['100', '50', 'none', '50'], ans: 1, exp: 'PEMDAS: exponent first (4²=16), then multiply (3×16=48), then add (2+48=50).' },
+  { cat: 'Algebra', q: 'Molarity M = moles/liters. If M = 2 and liters = 0.5, find moles.', opts: ['0.25 mol', '4 mol', '1 mol', '2.5 mol'], ans: 2, exp: 'moles = M \u00d7 liters = 2 \u00d7 0.5 = 1 mol.' },
+  { cat: 'Algebra', q: 'Evaluate: 2 + 3 \u00d7 4\u00b2', opts: ['100', '50', 'none', '50'], ans: 1, exp: 'PEMDAS: exponent first (4\u00b2=16), then multiply (3\u00d716=48), then add (2+48=50).' },
   { cat: 'Algebra', q: 'Solve for x: x/3 = 9', opts: ['x = 3', 'x = 27', 'x = 6', 'x = 12'], ans: 1, exp: 'Multiply both sides by 3: x = 27.' },
   // UNITS
-  { cat: 'Units', q: 'Convert 3.5 km to meters.', opts: ['350 m', '3500 m', '0.35 m', '35 m'], ans: 1, exp: 'kilo = 1000. 3.5 km × (1000 m/1 km) = 3500 m.' },
-  { cat: 'Units', q: 'Convert 250 mg to grams.', opts: ['25 g', '2.5 g', '0.25 g', '0.025 g'], ans: 2, exp: 'milli = 10⁻³. 250 mg × (1 g/1000 mg) = 0.25 g.' },
-  { cat: 'Units', q: 'What prefix means 10⁻⁶?', opts: ['milli-', 'nano-', 'micro-', 'pico-'], ans: 2, exp: 'Micro- (symbol µ) means 10⁻⁶. One microgram = 10⁻⁶ grams.' },
-  { cat: 'Units', q: 'You have 2.5 mol/L and 0.4 L of solution. How many moles?', opts: ['6.25 mol', '0.16 mol', '1.0 mol', '2.9 mol'], ans: 2, exp: 'moles = M × V = 2.5 mol/L × 0.4 L = 1.0 mol. Units: (mol/L) × L = mol.' },
-  { cat: 'Units', q: 'Convert 500 µL to mL.', opts: ['5000 mL', '50 mL', '0.5 mL', '0.05 mL'], ans: 2, exp: '1000 µL = 1 mL. So 500 µL ÷ 1000 = 0.5 mL.' },
+  { cat: 'Units', q: 'Convert 3.5 km to meters.', opts: ['350 m', '3500 m', '0.35 m', '35 m'], ans: 1, exp: 'kilo = 1000. 3.5 km \u00d7 (1000 m/1 km) = 3500 m.' },
+  { cat: 'Units', q: 'Convert 250 mg to grams.', opts: ['25 g', '2.5 g', '0.25 g', '0.025 g'], ans: 2, exp: 'milli = 10\u207b\u00b3. 250 mg \u00d7 (1 g/1000 mg) = 0.25 g.' },
+  { cat: 'Units', q: 'What prefix means 10\u207b\u2076?', opts: ['milli-', 'nano-', 'micro-', 'pico-'], ans: 2, exp: 'Micro- (symbol \u00b5) means 10\u207b\u2076. One microgram = 10\u207b\u2076 grams.' },
+  { cat: 'Units', q: 'You have 2.5 mol/L and 0.4 L of solution. How many moles?', opts: ['6.25 mol', '0.16 mol', '1.0 mol', '2.9 mol'], ans: 2, exp: 'moles = M \u00d7 V = 2.5 mol/L \u00d7 0.4 L = 1.0 mol. Units: (mol/L) \u00d7 L = mol.' },
+  { cat: 'Units', q: 'Convert 500 \u00b5L to mL.', opts: ['5000 mL', '50 mL', '0.5 mL', '0.05 mL'], ans: 2, exp: '1000 \u00b5L = 1 mL. So 500 \u00b5L \u00f7 1000 = 0.5 mL.' },
   // SCIENTIFIC NOTATION
-  { cat: 'Scientific Notation', q: 'Write 0.0000045 in scientific notation.', opts: ['4.5 × 10⁻⁵', '4.5 × 10⁵', '45 × 10⁻⁶', '0.45 × 10⁻⁴'], ans: 0, exp: 'Move decimal right 6 places to get 4.5; moved right means negative exponent: 4.5 × 10⁻⁶.' },
-  { cat: 'Scientific Notation', q: 'Calculate: (2.0 × 10³) × (3.0 × 10⁴)', opts: ['6.0 × 10⁷', '6.0 × 10¹²', '5.0 × 10⁷', '6.0 × 10⁸'], ans: 0, exp: 'Multiply coefficients (2 × 3 = 6), add exponents (3 + 4 = 7): 6.0 × 10⁷.' },
-  { cat: 'Scientific Notation', q: 'Calculate: (9.0 × 10⁸) ÷ (3.0 × 10³)', opts: ['3.0 × 10⁵', '3.0 × 10¹¹', '6.0 × 10⁵', '27 × 10²'], ans: 0, exp: 'Divide coefficients (9÷3=3), subtract exponents (8-3=5): 3.0 × 10⁵.' },
+  { cat: 'Scientific Notation', q: 'Write 0.0000045 in scientific notation.', opts: ['4.5 \u00d7 10\u207b\u2076', '4.5 \u00d7 10\u2076', '45 \u00d7 10\u207b\u2077', '0.45 \u00d7 10\u207b\u2075'], ans: 0, exp: 'Move decimal right 6 places to get 4.5; moved right means negative exponent: 4.5 \u00d7 10\u207b\u2076.' },
+  { cat: 'Scientific Notation', q: 'Calculate: (2.0 \u00d7 10\u00b3) \u00d7 (3.0 \u00d7 10\u2074)', opts: ['6.0 \u00d7 10\u2077', '6.0 \u00d7 10\u00b9\u00b2', '5.0 \u00d7 10\u2077', '6.0 \u00d7 10\u2078'], ans: 0, exp: 'Multiply coefficients (2 \u00d7 3 = 6), add exponents (3 + 4 = 7): 6.0 \u00d7 10\u2077.' },
+  { cat: 'Scientific Notation', q: 'Calculate: (9.0 \u00d7 10\u2078) \u00f7 (3.0 \u00d7 10\u00b3)', opts: ['3.0 \u00d7 10\u2075', '3.0 \u00d7 10\u00b9\u00b9', '6.0 \u00d7 10\u2075', '27 \u00d7 10\u00b2'], ans: 0, exp: 'Divide coefficients (9\u00f73=3), subtract exponents (8-3=5): 3.0 \u00d7 10\u2075.' },
   { cat: 'Scientific Notation', q: 'How many significant figures in 0.00420?', opts: ['5', '3', '2', '6'], ans: 1, exp: 'Leading zeros do not count. 4, 2, and the trailing 0 after the decimal all count: 3 sig figs.' },
-  { cat: 'Scientific Notation', q: 'Add: (3.0 × 10⁴) + (5.0 × 10³)', opts: ['8.0 × 10⁴', '3.5 × 10⁴', '8.0 × 10³', '3.5 × 10⁷'], ans: 1, exp: 'Convert to same exponent: 3.0 × 10⁴ + 0.5 × 10⁴ = 3.5 × 10⁴.' },
+  { cat: 'Scientific Notation', q: 'Add: (3.0 \u00d7 10\u2074) + (5.0 \u00d7 10\u00b3)', opts: ['8.0 \u00d7 10\u2074', '3.5 \u00d7 10\u2074', '8.0 \u00d7 10\u00b3', '3.5 \u00d7 10\u2077'], ans: 1, exp: 'Convert to same exponent: 3.0 \u00d7 10\u2074 + 0.5 \u00d7 10\u2074 = 3.5 \u00d7 10\u2074.' },
 ];
 
 let qIdx = 0, qScore = 0, answered = false, quizStarted = false;
@@ -1409,13 +1545,14 @@ function startQuiz() {
 function renderQuestion() {
   const q = shuffled[qIdx];
   document.getElementById('q-question').textContent = q.q;
-  document.getElementById('q-score').textContent = `Score: ${qScore} / ${qIdx}`;
-  document.getElementById('q-progress').textContent = `Question ${qIdx + 1} of ${shuffled.length}`;
+  document.getElementById('q-score').textContent = 'Score: ' + qScore + ' / ' + qIdx;
+  document.getElementById('q-progress').textContent = 'Question ' + (qIdx + 1) + ' of ' + shuffled.length;
   document.getElementById('q-bar').style.width = ((qIdx / shuffled.length) * 100) + '%';
   const opts = document.getElementById('q-options');
   opts.innerHTML = '';
   q.opts.forEach((opt, i) => {
     const btn = document.createElement('button');
+    btn.type = 'button';
     btn.className = 'quiz-option';
     btn.textContent = opt;
     btn.onclick = () => selectAnswer(i);
@@ -1440,7 +1577,7 @@ function selectAnswer(i) {
   exp.textContent = q.exp;
   exp.classList.add('show');
   document.getElementById('q-next').disabled = false;
-  document.getElementById('q-score').textContent = `Score: ${qScore} / ${qIdx + 1}`;
+  document.getElementById('q-score').textContent = 'Score: ' + qScore + ' / ' + (qIdx + 1);
 }
 
 function nextQuestion() {
@@ -1455,7 +1592,7 @@ function nextQuestion() {
 function showFinal() {
   document.getElementById('quiz-active').style.display = 'none';
   const pct = Math.round((qScore / shuffled.length) * 100);
-  document.getElementById('final-score').textContent = `${qScore} / ${shuffled.length}`;
+  document.getElementById('final-score').textContent = qScore + ' / ' + shuffled.length;
   const msgs = [
     [0, 49, "Keep going. These gaps are exactly what this guide is here to close. Work through each section and try again."],
     [50, 69, "You have a foundation to build on. Review the sections where you missed questions and practice those operations until they feel automatic."],
@@ -1469,42 +1606,42 @@ function showFinal() {
 
 // ═══ FLASHCARDS ═══
 const cards = [
-  { cat: 'Fractions', front: '(a/b) × (c/d) = ?', back: '(a×c) / (b×d)\nMultiply straight across.' },
-  { cat: 'Fractions', front: '(a/b) ÷ (c/d) = ?', back: '(a/b) × (d/c)\nFlip the second fraction and multiply.' },
+  { cat: 'Fractions', front: '(a/b) \u00d7 (c/d) = ?', back: '(a\u00d7c) / (b\u00d7d)\nMultiply straight across.' },
+  { cat: 'Fractions', front: '(a/b) \u00f7 (c/d) = ?', back: '(a/b) \u00d7 (d/c)\nFlip the second fraction and multiply.' },
   { cat: 'Fractions', front: 'To add fractions with different denominators:', back: 'Find the least common denominator, convert both fractions, then add numerators.' },
   { cat: 'Fractions', front: 'Reciprocal of 3/7?', back: '7/3\nFlip numerator and denominator.' },
-  { cat: 'Fractions', front: 'Simplify 18/24', back: '3/4\nGCF of 18 and 24 is 6. 18÷6=3, 24÷6=4.' },
-  { cat: 'Fractions', front: '(2/3) ÷ (4/9) = ?', back: '3/2\n(2/3) × (9/4) = 18/12 = 3/2' },
-  { cat: 'Number Facts', front: '7 × 8 = ?', back: '56\nRemember: 5,6,7,8 — five-six equals seven times eight.' },
-  { cat: 'Number Facts', front: '8 × 9 = ?', back: '72\nDigits of 8×9 add to 9: 7+2=9.' },
-  { cat: 'Number Facts', front: '6 × 7 = ?', back: '42' },
-  { cat: 'Number Facts', front: '9 × 9 = ?', back: '81\nReverse of 18. Digits add to 9.' },
-  { cat: 'Number Facts', front: '7 × 7 = ?', back: '49' },
-  { cat: 'Number Facts', front: '6 × 8 = ?', back: '48' },
-  { cat: 'Number Facts', front: '(-3) × (-5) = ?', back: '+15\nSame signs → positive result.' },
-  { cat: 'Number Facts', front: '(-6) × 4 = ?', back: '-24\nDifferent signs → negative result.' },
-  { cat: 'Number Facts', front: '8 - (-3) = ?', back: '11\nSubtracting negative = adding positive.\n8 + 3 = 11.' },
-  { cat: 'Number Facts', front: '√81 = ?', back: '9\n9 × 9 = 81.' },
-  { cat: 'Number Facts', front: '√144 = ?', back: '12\n12 × 12 = 144.' },
+  { cat: 'Fractions', front: 'Simplify 18/24', back: '3/4\nGCF of 18 and 24 is 6. 18\u00f76=3, 24\u00f76=4.' },
+  { cat: 'Fractions', front: '(2/3) \u00f7 (4/9) = ?', back: '3/2\n(2/3) \u00d7 (9/4) = 18/12 = 3/2' },
+  { cat: 'Number Facts', front: '7 \u00d7 8 = ?', back: '56\nRemember: 5,6,7,8 \u2014 five-six equals seven times eight.' },
+  { cat: 'Number Facts', front: '8 \u00d7 9 = ?', back: '72\nDigits of 8\u00d79 add to 9: 7+2=9.' },
+  { cat: 'Number Facts', front: '6 \u00d7 7 = ?', back: '42' },
+  { cat: 'Number Facts', front: '9 \u00d7 9 = ?', back: '81\nReverse of 18. Digits add to 9.' },
+  { cat: 'Number Facts', front: '7 \u00d7 7 = ?', back: '49' },
+  { cat: 'Number Facts', front: '6 \u00d7 8 = ?', back: '48' },
+  { cat: 'Number Facts', front: '(\u22123) \u00d7 (\u22125) = ?', back: '+15\nSame signs \u2192 positive result.' },
+  { cat: 'Number Facts', front: '(\u22126) \u00d7 4 = ?', back: '\u221224\nDifferent signs \u2192 negative result.' },
+  { cat: 'Number Facts', front: '8 \u2212 (\u22123) = ?', back: '11\nSubtracting negative = adding positive.\n8 + 3 = 11.' },
+  { cat: 'Number Facts', front: '\u221a81 = ?', back: '9\n9 \u00d7 9 = 81.' },
+  { cat: 'Number Facts', front: '\u221a144 = ?', back: '12\n12 \u00d7 12 = 144.' },
   { cat: 'Algebra', front: 'Golden rule of algebra', back: 'Whatever you do to one side of an equation, you must do to the other side.' },
   { cat: 'Algebra', front: 'Solve: 5x = 45', back: 'x = 9\nDivide both sides by 5.' },
-  { cat: 'Algebra', front: 'Solve: 3x - 6 = 15', back: 'x = 7\nAdd 6 to both sides: 3x = 21.\nDivide by 3: x = 7.' },
+  { cat: 'Algebra', front: 'Solve: 3x \u2212 6 = 15', back: 'x = 7\nAdd 6 to both sides: 3x = 21.\nDivide by 3: x = 7.' },
   { cat: 'Algebra', front: 'PV = nRT, solve for P', back: 'P = nRT / V\nDivide both sides by V.' },
-  { cat: 'Algebra', front: 'PEMDAS order', back: 'Parentheses → Exponents → Multiply/Divide (L to R) → Add/Subtract (L to R)' },
+  { cat: 'Algebra', front: 'PEMDAS order', back: 'Parentheses \u2192 Exponents \u2192 Multiply/Divide (L to R) \u2192 Add/Subtract (L to R)' },
   { cat: 'Algebra', front: 'Set up a proportion for: 3 mol uses 6 L. How many L for 5 mol?', back: '3/6 = 5/x\nCross-multiply: 3x = 30, x = 10 L.' },
-  { cat: 'Units', front: 'kilo- means?', back: '10³ = 1000\n1 km = 1000 m, 1 kg = 1000 g' },
-  { cat: 'Units', front: 'milli- means?', back: '10⁻³ = 0.001\n1 mg = 0.001 g, 1 mL = 0.001 L' },
-  { cat: 'Units', front: 'micro- means?', back: '10⁻⁶ = 0.000001\nSymbol: µ\n1 µg = 10⁻⁶ g' },
-  { cat: 'Units', front: 'nano- means?', back: '10⁻⁹\n1 nm = 10⁻⁹ m' },
-  { cat: 'Units', front: 'Convert 750 mL to liters', back: '0.75 L\n750 mL × (1 L / 1000 mL)' },
-  { cat: 'Units', front: 'Convert 2.5 kg to grams', back: '2500 g\n2.5 kg × (1000 g / 1 kg)' },
+  { cat: 'Units', front: 'kilo- means?', back: '10\u00b3 = 1000\n1 km = 1000 m, 1 kg = 1000 g' },
+  { cat: 'Units', front: 'milli- means?', back: '10\u207b\u00b3 = 0.001\n1 mg = 0.001 g, 1 mL = 0.001 L' },
+  { cat: 'Units', front: 'micro- means?', back: '10\u207b\u2076 = 0.000001\nSymbol: \u00b5\n1 \u00b5g = 10\u207b\u2076 g' },
+  { cat: 'Units', front: 'nano- means?', back: '10\u207b\u2079\n1 nm = 10\u207b\u2079 m' },
+  { cat: 'Units', front: 'Convert 750 mL to liters', back: '0.75 L\n750 mL \u00d7 (1 L / 1000 mL)' },
+  { cat: 'Units', front: 'Convert 2.5 kg to grams', back: '2500 g\n2.5 kg \u00d7 (1000 g / 1 kg)' },
   { cat: 'Units', front: 'Dimensional analysis: the key principle', back: 'Units cancel like numbers.\nSet up conversion factors so unwanted units cancel, leaving only the unit you want.' },
-  { cat: 'Sci. Notation', front: 'Write 6,700,000 in scientific notation', back: '6.7 × 10⁶\nMoved decimal 6 places left.' },
-  { cat: 'Sci. Notation', front: 'Write 0.00083 in scientific notation', back: '8.3 × 10⁻⁴\nMoved decimal 4 places right.' },
-  { cat: 'Sci. Notation', front: '(4.0 × 10⁵) × (2.0 × 10³) = ?', back: '8.0 × 10⁸\nMultiply coefficients, add exponents.' },
-  { cat: 'Sci. Notation', front: '(6.0 × 10⁹) ÷ (2.0 × 10⁴) = ?', back: '3.0 × 10⁵\nDivide coefficients, subtract exponents.' },
+  { cat: 'Sci. Notation', front: 'Write 6,700,000 in scientific notation', back: '6.7 \u00d7 10\u2076\nMoved decimal 6 places left.' },
+  { cat: 'Sci. Notation', front: 'Write 0.00083 in scientific notation', back: '8.3 \u00d7 10\u207b\u2074\nMoved decimal 4 places right.' },
+  { cat: 'Sci. Notation', front: '(4.0 \u00d7 10\u2075) \u00d7 (2.0 \u00d7 10\u00b3) = ?', back: '8.0 \u00d7 10\u2078\nMultiply coefficients, add exponents.' },
+  { cat: 'Sci. Notation', front: '(6.0 \u00d7 10\u2079) \u00f7 (2.0 \u00d7 10\u2074) = ?', back: '3.0 \u00d7 10\u2075\nDivide coefficients, subtract exponents.' },
   { cat: 'Sci. Notation', front: 'How many sig figs in 0.00420?', back: '3\n4, 2, and trailing 0 after decimal.\nLeading zeros never count.' },
-  { cat: 'Sci. Notation', front: 'Avogadro\'s number in scientific notation', back: '6.022 × 10²³\nNumber of particles in one mole of substance.' },
+  { cat: 'Sci. Notation', front: "Avogadro's number in scientific notation", back: '6.022 \u00d7 10\u00b2\u00b3\nNumber of particles in one mole of substance.' },
 ];
 
 const cats = ['All', ...new Set(cards.map(c => c.cat))];
@@ -1515,6 +1652,7 @@ function buildFilters() {
   wrap.innerHTML = '';
   cats.forEach(cat => {
     const btn = document.createElement('button');
+    btn.type = 'button';
     btn.className = 'fc-filter' + (cat === fcCat ? ' active' : '');
     btn.textContent = cat;
     btn.onclick = () => {
@@ -1538,17 +1676,23 @@ function renderCard() {
   const c = fcDeck[fcIdx];
   document.getElementById('fc-front-text').textContent = c.front;
   document.getElementById('fc-back-text').textContent = c.back;
-  document.getElementById('fc-pos').textContent = `${fcIdx + 1} / ${fcDeck.length}`;
+  document.getElementById('fc-pos').textContent = (fcIdx + 1) + ' / ' + fcDeck.length;
   const countLabel = document.getElementById('fc-count-label');
   if (countLabel) countLabel.textContent = fcDeck.length + ' cards';
   const card = document.getElementById('fc-card');
   card.classList.remove('flipped');
   fcFlipped = false;
+  // reset aria-label on scene
+  const scene = document.getElementById('fc-scene');
+  if (scene) scene.setAttribute('aria-label', 'Flashcard \u2014 press Space or Enter to flip');
 }
 
-function flipCard() {
+function flipCard(el) {
   fcFlipped = !fcFlipped;
   document.getElementById('fc-card').classList.toggle('flipped', fcFlipped);
+  el.setAttribute('aria-label', fcFlipped
+    ? 'Answer showing \u2014 press Space or Enter to flip back'
+    : 'Flashcard \u2014 press Space or Enter to flip');
 }
 
 function fcNav(dir) {
